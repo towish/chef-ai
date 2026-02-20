@@ -45,13 +45,9 @@ export default function Home() {
         formData.append("type", "text");
         formData.append("content", textInput);
       } else {
-        formData.append("type", "multimodal");
-        formData.append("content", voice.transcript || "Génère une recette avec ces ingrédients");
-        
-        if (camera.capturedImage) {
-          const blob = await fetch(camera.capturedImage).then(r => r.blob());
-          formData.append("image", blob, "capture.jpg");
-        }
+        // Scan mode - use text description only (Groq doesn't support images)
+        formData.append("type", "text");
+        formData.append("content", voice.transcript || "Recette surprise avec les ingrédients détectés");
       }
 
       const result = await generateRecipe(formData);
@@ -138,16 +134,16 @@ export default function Home() {
           </div>
 
           {!recipe && (
-            <div className="flex bg-black/40 backdrop-blur-xl border border-white/10 rounded-full p-1">
+            <div className="flex bg-black/40 backdrop-blur-xl border border-white/10 rounded-full p-1.5">
               <button onClick={() => { setMode("scan"); camera.startCamera(); }}
-                className={clsx("px-4 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 transition-all",
-                  mode === "scan" ? "bg-white text-black" : "text-neutral-400 hover:text-white")}>
-                <Scan className="w-3 h-3" /> Scan
+                className={clsx("px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all",
+                  mode === "scan" ? "bg-white text-black" : "text-white hover:bg-white/20")}>
+                <Scan className="w-4 h-4" /> Scan
               </button>
               <button onClick={() => { setMode("text"); camera.stopCamera(); }}
-                className={clsx("px-4 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 transition-all",
-                  mode === "text" ? "bg-white text-black" : "text-neutral-400 hover:text-white")}>
-                <AlignLeft className="w-3 h-3" /> Text
+                className={clsx("px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all",
+                  mode === "text" ? "bg-white text-black" : "text-white hover:bg-white/20")}>
+                <AlignLeft className="w-4 h-4" /> Texte
               </button>
             </div>
           )}
