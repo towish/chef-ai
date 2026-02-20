@@ -10,7 +10,7 @@ import {
 import clsx from "clsx";
 
 export default function Home() {
-  const [mode, setMode] = useState<"scan" | "text">("scan");
+  const [mode, setMode] = useState<"scan" | "text">("text"); // Default to TEXT mode
   const [textInput, setTextInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
