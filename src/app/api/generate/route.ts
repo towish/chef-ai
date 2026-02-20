@@ -29,71 +29,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 🚀 APPEL GROQ API avec prompt détaillé
+    // 🚀 APPEL GROQ API SANS PROMPT (comme Raph a fait avec Grok)
     const completion = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [
-        {
-          role: 'system',
-          content: `Tu es un chef cuisinier québécois expérimenté. Tu DOIS répondre en JSON.
-
-Format EXACT:
-{
-  "title": "Smash Burger Style Normandin",
-  "description": "Un double smash burger juteux avec confit d'oignons",
-  "prepTime": "15 min",
-  "cookTime": "10 min",
-  "servings": 2,
-  "ingredients": [
-    "500g bœuf haché 80/20",
-    "4 tranches fromage américain orange",
-    "2 oignons jaunes",
-    "2 pains briochés",
-    "Beurre, sel, poivre"
-  ],
-  "instructions": [
-    "Caraméliser les oignons 30 min à feu doux",
-    "Diviser la viande en 4 boules de 125g",
-    "Chauffer poêle fonte à feu vif",
-    "Smash les boules très fort (0.5cm épaisseur)",
-    "Cuire 2-3 min, retourner, ajouter fromage",
-    "Griller les pains au beurre",
-    "Assembler: pain, moutarde, cornichons, patty, oignons, patty, fromage, pain"
-  ],
-  "tips": [
-    "Poêle TRÈS chaude = croustillant",
-    "Smash immédiatement après avoir posé la viande",
-    "Fromage orange = secret du goût Normandin"
-  ]
-}`
-        },
         {
           role: 'user',
           content: query
         }
       ],
-      temperature: 0.85,
-      max_tokens: 2500,
+      temperature: 0.9,
+      max_tokens: 3000,
     });
 
     const text = completion.choices[0]?.message?.content || '';
     
-    // Extract JSON
+    // Try to extract JSON, if not, return as text
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('No JSON found in response:', text.substring(0, 500));
-      return NextResponse.json({
-        success: false,
-        error: 'Le chef a eu un souci. Réessaie!',
-      });
+    if (jsonMatch) {
+      try {
+        const recipe = JSON.parse(jsonMatch[0]);
+        return NextResponse.json({
+          success: true,
+          recipe,
+          source: 'groq',
+          raw: text,
+          timestamp: new Date().toISOString(),
+        });
+      } catch {
+        // JSON parse failed, return as text
+      }
     }
-
-    const recipe = JSON.parse(jsonMatch[0]);
     
+    // No JSON found - return raw text (Raph's way works!)
     return NextResponse.json({
       success: true,
-      recipe,
+      recipe: {
+        title: query,
+        description: "Recette générée par Groq",
+        rawText: text,
+      },
       source: 'groq',
+      raw: text,
       timestamp: new Date().toISOString(),
     });
 
