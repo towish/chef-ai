@@ -1,16 +1,18 @@
 "use server";
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { z } from "zod";
 
 // ═══════════════════════════════════════════════════════════
-// 🔧 CONFIGURATION & INIT
+// 🔧 CONFIGURATION & INIT — GROQ (ULTRA RAPIDE)
 // ═══════════════════════════════════════════════════════════
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
-// 🎯 NOUVEAU MODÈLE: gemini-1.5-flash LATEST (Supporte Vision + Texte)
-const MODEL_NAME = "gemini-1.5-flash-latest";
+// 🎯 MODÈLE: llama-3.3-70b-versatile (rapide + intelligent)
+const MODEL_NAME = "llama-3.3-70b-versatile";
 
 // ═══════════════════════════════════════════════════════════
 // 🛡️ SCHEMA VALIDATION (Zod)
@@ -200,67 +202,35 @@ export async function generateRecipe(formData: FormData): Promise<{
 }> {
   const type = formData.get("type") as string;
   const content = formData.get("content") as string;
-  const imageFile = formData.get("image") as File | null;
 
-  // 🎯 Try Gemini API first, fallback to mock
+  // 🎯 Try Groq API first (ULTRA RAPIDE), fallback to mock
   try {
-    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+    const userRequest = type === "text" || type === "ingredients"
+      ? `Voici ma demande: ${content}`
+      : `Voici ma demande: ${content || "Une recette surprise"}`;
 
-    // Construire les parties du prompt
-    const parts: any[] = [{ text: SYSTEM_PROMPT }];
-    let userRequest = "";
+    // 🚀 APPEL GROQ API
+    const completion = await groq.chat.completions.create({
+      model: MODEL_NAME,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userRequest }
+      ],
+      temperature: 0.7,
+      max_tokens: 1024,
+    });
 
-    if (type === "text" || type === "ingredients") {
-      userRequest = `Voici ma demande: ${content}`;
-      parts.push({ text: userRequest });
-    } else if (type === "multimodal" && imageFile && imageFile.size > 0) {
-      // Convertir l'image en base64
-      const arrayBuffer = await imageFile.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString("base64");
-      const mimeType = imageFile.type || "image/jpeg";
-
-      parts.push({
-        inlineData: {
-          mimeType,
-          data: base64,
-        },
-      });
-      
-      userRequest = content 
-        ? `Analyse cette image et ma demande: "${content}". Donne-moi une recette.`
-        : "Analyse les ingrédients sur cette photo et propose une recette créative.";
-      
-      parts.push({ text: userRequest });
-    } else {
-      // Fallback: text only
-      userRequest = `Voici ma demande: ${content || "Une recette surprise"}`;
-      parts.push({ text: userRequest });
-    }
-
-    // 🚀 APPEL API with timeout
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('API timeout')), 10000)
-    );
+    const text = completion.choices[0]?.message?.content || "";
     
-    const result = await Promise.race([
-      model.generateContent(parts),
-      timeoutPromise
-    ]) as any;
-    
-    const response = await result.response;
-    let text = response.text();
-
     // 🧹 NETTOYAGE (enlever ```json ... ```)
-    text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
     // 📦 PARSE JSON
     let json;
     try {
-      json = JSON.parse(text);
+      json = JSON.parse(cleaned);
     } catch (parseError) {
-      console.error("JSON Parse Error. Raw text:", text.substring(0, 200));
-      // Return mock recipe instead of failing
-      console.log("Returning mock recipe due to parse error");
+      console.error("JSON Parse Error. Raw text:", cleaned.substring(0, 200));
       return {
         success: true,
         data: getSmartMockRecipe(content || userRequest),
