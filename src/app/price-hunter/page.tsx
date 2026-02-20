@@ -25,14 +25,17 @@ export default function PriceHunterPage() {
   const [groceryList, setGroceryList] = useState<ProductResult[]>([]);
   const [showList, setShowList] = useState(false);
 
-  // Load categories on mount
-  useState(() => {
+  // Load categories on mount (client-side only)
+  useEffect(() => {
     fetch('/api/prices?list=categories')
       .then(r => r.json())
       .then(data => {
         if (data.success) setCategories(data.categories);
+      })
+      .catch(() => {
+        // Ignore errors during build/SSR
       });
-  });
+  }, []);
 
   const searchPrices = async () => {
     if (!ingredient.trim()) return;
