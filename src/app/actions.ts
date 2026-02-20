@@ -56,44 +56,137 @@ Règles:
 `;
 
 // ═══════════════════════════════════════════════════════════
-// 🍳 MOCK RECIPES (Fallback)
+// 🍳 SMART MOCK RECIPES (Context-Aware Fallback)
 // ═══════════════════════════════════════════════════════════
 
-const MOCK_RECIPES: Recipe[] = [
-  {
-    title: "Poulet Sauté aux Légumes",
-    ingredients: ["2 poitrines de poulet", "1 oignon", "2 gousses d'ail", "2 c.soupe d'huile", "Sel et poivre"],
-    steps: [
-      "Couper le poulet en dés et l'oignon en lamelles",
-      "Chauffer l'huile dans un wok à feu vif",
-      "Faire revenir l'oignon et l'ail 2 minutes",
-      "Ajouter le poulet et cuire 8-10 minutes en remuant",
-      "Servir chaud avec du riz ou des nouilles"
+const MOCK_RECIPES: Record<string, Recipe> = {
+  burger: {
+    title: "Smash Burger Style Normandin",
+    ingredients: [
+      "2 lbs bœuf haché 80/20",
+      "4 pains à burger briochés",
+      "4 tranches fromage cheddar",
+      "Oignons émincés",
+      "Cornichons",
+      "Sauce spéciale (mayo + ketchup + relish)",
+      "Laitue, tomate",
+      "Sel, poivre"
     ],
-    tips: ["Mariner le poulet 30 min pour plus de saveur", "Ajouter des légumes selon la saison"],
+    steps: [
+      "Diviser le bœuf en 8 boules de 125g",
+      "Chauffer une plaque de fonte à feu TRÈS fort",
+      "Placer une boule, l'aplatir FORT avec une spatule (smash!)",
+      "Saler généreusement, cuire 2-3 min",
+      "Retourner, ajouter fromage, cuire 1-2 min",
+      "Griller les pains légèrement",
+      "Assembler: sauce, laitue, viande, fromage, oignons, cornichons, tomate",
+      "Servir immédiatement avec frites"
+    ],
+    tips: [
+      "Le secret: plaque TRÈS chaude et smash immédiat",
+      "Ne pas trop travailler la viande",
+      "Fromage sur le burger pendant la cuisson"
+    ],
     prepTime: "15 min",
-    cookTime: "25 min",
+    cookTime: "10 min",
     servings: 4
   },
-  {
-    title: "Pâtes Carbonara Rapides",
-    ingredients: ["400g pâtes", "200g lardons", "3 œufs", "100g parmesan", "Poivre noir"],
-    steps: [
-      "Cuire les pâtes al dente dans l'eau salée",
-      "Faire dorer les lardons dans une poêle",
-      "Battre les œufs avec le parmesan et le poivre",
-      "Égoutter les pâtes et les ajouter aux lardons (feu éteint)",
-      "Verser le mélange œufs/parmesan et remuer vite"
+  poutine: {
+    title: "Poutine Québécoise Authentique",
+    ingredients: [
+      "2 lbs frites fraîches",
+      "1 lb fromage en grains (squeaky cheese!)",
+      "2 tasses sauce brune (sauce St-Hubert ou maison)",
+      "Sel",
+      "Huile pour friture"
     ],
-    tips: ["Le secret: mélanger hors du feu pour des œufs crémeux"],
-    prepTime: "5 min",
+    steps: [
+      "Frire les frites à 325°F 5 min (première friture)",
+      "Égoutter et laisser reposer 5 min",
+      "Refaire frire à 375°F 3-4 min jusqu'à dorées",
+      "Placer les frites dans un bol",
+      "Ajouter les fromage en grains sur les frites chaudes",
+      "Verser la sauce brune chaude par-dessus",
+      "Mélanger légèrement et servir immédiatement"
+    ],
+    tips: [
+      "Le fromage doit grincer sous la dent!",
+      "Sauce chaude = fromage légèrement fondu",
+      "Servir dans un bol en styrofoam pour l'authenticité"
+    ],
+    prepTime: "10 min",
     cookTime: "15 min",
     servings: 4
+  },
+  default: {
+    title: "Poulet Rôti Simple",
+    ingredients: [
+      "1 poulet entier",
+      "3 c.soupe beurre",
+      "Herbes de Provence",
+      "Sel, poivre",
+      "2 citrons"
+    ],
+    steps: [
+      "Préchauffer le four à 425°F",
+      "Badigeonner le poulet de beurre fondu",
+      "Assaisonner généreusement",
+      "Placer les citrons à l'intérieur",
+      "Cuire 1h15 jusqu'à 165°F interne",
+      "Laisser reposer 10 min avant de servir"
+    ],
+    tips: ["Utiliser un thermomètre pour la cuisson parfaite"],
+    prepTime: "10 min",
+    cookTime: "1h15",
+    servings: 4
   }
-];
+};
 
-function getRandomMockRecipe(): Recipe {
-  return MOCK_RECIPES[Math.floor(Math.random() * MOCK_RECIPES.length)];
+function getSmartMockRecipe(request: string): Recipe {
+  const lower = request.toLowerCase();
+  
+  if (lower.includes('burger') || lower.includes('smash') || lower.includes('normandin')) {
+    return MOCK_RECIPES.burger;
+  }
+  if (lower.includes('poutine') || lower.includes('québec') || lower.includes('fromage')) {
+    return MOCK_RECIPES.poutine;
+  }
+  if (lower.includes('pâte') || lower.includes('pasta') || lower.includes('carbonara')) {
+    return {
+      title: "Pâtes Carbonara Authentiques",
+      ingredients: ["400g spaghetti", "200g guanciale", "4 jaunes d'œufs", "100g pecorino romano", "Poivre noir"],
+      steps: [
+        "Cuire les pâtes al dente",
+        "Faire dorer le guanciale",
+        "Battre jaunes + pecorino + poivre",
+        "Mélanger pâtes et guanciale (feu éteint)",
+        "Ajouter le mélange œufs et remuer vite"
+      ],
+      tips: ["Jamais de crème! Juste œufs et fromage"],
+      prepTime: "5 min",
+      cookTime: "15 min",
+      servings: 4
+    };
+  }
+  if (lower.includes('poulet') || lower.includes('chicken')) {
+    return {
+      title: "Poulet Rôti aux Herbes",
+      ingredients: ["4 cuisses de poulet", "Herbes de Provence", "3 c.soupe huile d'olive", "4 gousses d'ail", "1 citron"],
+      steps: [
+        "Préchauffer le four à 400°F",
+        "Mélanger huile, herbes, ail",
+        "Badigeonner le poulet",
+        "Cuire 45 min jusqu'à doré",
+        "Servir avec jus de citron"
+      ],
+      tips: ["Température interne 165°F"],
+      prepTime: "10 min",
+      cookTime: "45 min",
+      servings: 4
+    };
+  }
+  
+  return MOCK_RECIPES.default;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -170,7 +263,7 @@ export async function generateRecipe(formData: FormData): Promise<{
       console.log("Returning mock recipe due to parse error");
       return {
         success: true,
-        data: getRandomMockRecipe(),
+        data: getSmartMockRecipe(content || userRequest),
       };
     }
 
@@ -182,7 +275,7 @@ export async function generateRecipe(formData: FormData): Promise<{
       // Return mock recipe on validation error
       return {
         success: true,
-        data: getRandomMockRecipe(),
+        data: getSmartMockRecipe(content || userRequest),
       };
     }
 
@@ -195,11 +288,11 @@ export async function generateRecipe(formData: FormData): Promise<{
   } catch (error: any) {
     console.error("API Error:", error);
     
-    // 🍳 FALLBACK: Return mock recipe on any error
-    console.log("Returning mock recipe due to API error");
+    // 🍳 FALLBACK: Return smart mock recipe based on request
+    console.log("Returning smart mock recipe due to API error");
     return {
       success: true,
-      data: getRandomMockRecipe(),
+      data: getSmartMockRecipe(content || "default"),
     };
   }
 }
