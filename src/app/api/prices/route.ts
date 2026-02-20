@@ -9,29 +9,29 @@ const PRODUCTS: Record<string, Record<string, { price: number; store: string; un
   // VIANDES
   // ═══════════════════════════════════════════════════════════
   boeuf: {
-    'haut de surlonge': getPriceList(8.79),
-    'filet mignon': getPriceList(17.99),
-    'bifteck surlonge': getPriceList(12.49),
-    'palette': getPriceList(5.79),
-    'rôti de boeuf': getPriceList(9.79),
-    'steak haché': getPriceList(6.79),
-    'boulettes': getPriceList(5.79),
-    't-bone': getPriceList(14.99),
-    'ribs de boeuf': getPriceList(11.99),
+    'haut de surlonge': getPriceList(15.99, 'kg'),
+    'filet mignon': getPriceList(42.99, 'kg'),
+    'bifteck surlonge': getPriceList(19.99, 'kg'),
+    'palette': getPriceList(8.99, 'kg'),
+    'rôti de boeuf': getPriceList(14.99, 'kg'),
+    'steak haché': getPriceList(9.99, 'kg'),
+    'boulettes': getPriceList(7.99, 'kg'),
+    't-bone': getPriceList(24.99, 'kg'),
+    'ribs de boeuf': getPriceList(16.99, 'kg'),
   },
   porc: {
-    'côtelettes': getPriceList(4.79),
-    'filet de porc': getPriceList(6.79),
-    'épaule de porc': getPriceList(3.79),
-    'carré de porc': getPriceList(5.49),
-    'travers de porc': getPriceList(4.99),
+    'côtelettes': getPriceList(6.99, 'kg'),
+    'filet de porc': getPriceList(9.99, 'kg'),
+    'épaule de porc': getPriceList(5.49, 'kg'),
+    'carré de porc': getPriceList(7.99, 'kg'),
+    'travers de porc': getPriceList(6.99, 'kg'),
   },
   poulet: {
-    'poitrines': getPriceList(8.79),
-    'cuisses': getPriceList(3.79),
-    'ailes': getPriceList(4.79),
-    'dinde hachée': getPriceList(5.99),
-    'poulet entier': getPriceList(2.99, 'lb'),
+    'poitrines': getPriceList(9.99, 'kg'),
+    'cuisses': getPriceList(4.99, 'kg'),
+    'ailes': getPriceList(6.99, 'kg'),
+    'dinde hachée': getPriceList(7.99, 'kg'),
+    'poulet entier': getPriceList(3.49, 'lb'),
   },
   poisson: {
     'saumon': getPriceList(12.99),
@@ -215,12 +215,14 @@ const PRODUCTS: Record<string, Record<string, { price: number; store: string; un
   },
 };
 
-// Helper to generate price list for all stores
+// Helper to generate price list for all stores (more realistic QC prices)
 function getPriceList(basePrice: number, unit?: string) {
   const stores = ['Walmart', 'Super C', 'Maxi', 'Metro', 'Provigo', 'IGA'];
+  // More realistic spread: Walmart/Super C cheaper, IGA/Provigo pricier
+  const multipliers = [1.0, 1.03, 1.06, 1.12, 1.18, 1.25];
   return stores.map((store, i) => ({
     store,
-    price: parseFloat((basePrice * (1 + (i * 0.05))).toFixed(2)),
+    price: parseFloat((basePrice * multipliers[i]).toFixed(2)),
     unit,
   }));
 }

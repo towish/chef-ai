@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, TrendingDown, Loader2, ShoppingCart, Plus, Check } from "lucide-react";
+import { Search, TrendingDown, Loader2, ShoppingCart, Plus, Check, AlertCircle } from "lucide-react";
 
 interface PriceItem {
   store: string;
@@ -62,7 +62,6 @@ export default function PriceHunterPage() {
   const isInList = (item: string) => groceryList.find(i => i.item === item);
 
   const generateGroceryList = () => {
-    // Group by store
     const byStore: Record<string, { items: string[]; total: number }> = {};
     
     groceryList.forEach(item => {
@@ -83,13 +82,21 @@ export default function PriceHunterPage() {
     <div className="min-h-screen bg-neutral-950 text-white pt-20 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-full mb-4">
+        <div className="text-center mb-4">
+          <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-full mb-3">
             <TrendingDown className="w-4 h-4 text-green-400" />
             <span className="text-green-400 text-sm font-medium">155+ produits comparés</span>
           </div>
           <h1 className="text-2xl font-bold mb-1">Price Hunter Québec</h1>
-          <p className="text-neutral-400 text-sm">6 magasins: Walmart, Super C, Maxi, Metro, Provigo, IGA</p>
+          <p className="text-neutral-400 text-sm">Walmart • Super C • Maxi • Metro • Provigo • IGA</p>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 mb-4 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-amber-200">
+            Prix indicatifs basés sur les circulaire québécoises. Les prix réels peuvent varier. Validez en magasin.
+          </p>
         </div>
 
         {/* Search Form */}
@@ -114,11 +121,11 @@ export default function PriceHunterPage() {
           
           {/* Category buttons */}
           <div className="flex flex-wrap gap-2 mt-3">
-            {categories.slice(0, 6).map(cat => (
+            {categories.slice(0, 8).map(cat => (
               <button
                 key={cat.name}
                 onClick={() => setIngredient(cat.name)}
-                className="text-xs bg-white/5 hover:bg-white/10 px-3 py-1 rounded-full transition"
+                className="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full transition capitalize"
               >
                 {cat.name} ({cat.itemCount})
               </button>
@@ -139,12 +146,12 @@ export default function PriceHunterPage() {
               </span>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {Object.entries(groceryByStore).map(([store, data]) => (
                 <div key={store} className="text-sm">
-                  <div className="flex justify-between text-neutral-400">
+                  <div className="flex justify-between text-neutral-300">
                     <span>{store}: {data.items.length} articles</span>
-                    <span>${data.total.toFixed(2)}</span>
+                    <span className="font-medium">${data.total.toFixed(2)}</span>
                   </div>
                 </div>
               ))}
@@ -170,7 +177,9 @@ export default function PriceHunterPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-green-400 font-bold">${item.bestDeal.price.toFixed(2)}</div>
+                    <div className="text-green-400 font-bold">
+                      ${item.bestDeal.price.toFixed(2)} {item.bestDeal.unit || ''}
+                    </div>
                     <div className="text-xs text-neutral-500">{item.bestDeal.store}</div>
                   </div>
                   <button
@@ -188,8 +197,8 @@ export default function PriceHunterPage() {
               </div>
               
               <div className="p-2">
-                {item.prices.slice(0, 4).map((p, j) => (
-                  <div key={j} className={`flex justify-between py-1.5 px-2 text-sm ${j === 0 ? 'text-green-400' : 'text-neutral-400'}`}>
+                {item.prices.map((p, j) => (
+                  <div key={j} className={`flex justify-between py-1.5 px-2 text-sm ${j === 0 ? 'text-green-400 font-medium' : 'text-neutral-400'}`}>
                     <span>{p.store}</span>
                     <span>${p.price.toFixed(2)} {p.unit || ''}</span>
                   </div>
