@@ -126,7 +126,7 @@ export async function generateRecipe(formData: FormData): Promise<{
     const validationResult = RecipeSchema.safeParse(json);
 
     if (!validationResult.success) {
-      console.error("Zod Validation Error:", validationResult.error.errors);
+      console.error("Zod Validation Error:", validationResult.error.issues);
       return {
         success: false,
         error: "La recette n'est pas complète. Réessaie!",
