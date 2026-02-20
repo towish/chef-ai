@@ -1,208 +1,226 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // ═══════════════════════════════════════════════════════════
-// 🏹 PRICE HUNTER API — Real Price Comparison
+// Price Hunter API — Québec Grocery Prices with MEAT CUTS
 // ═══════════════════════════════════════════════════════════
 
-interface PriceResult {
-  store: string;
-  product: string;
-  price: number;
-  unit: string;
-  inStock: boolean;
-  url?: string;
-}
+const MEAT_CUTS: Record<string, Record<string, { price: number; store: string }[]>> = {
+  boeuf: {
+    'haut de surlonge': [
+      { store: 'Walmart', price: 8.79 },
+      { store: 'Super C', price: 8.99 },
+      { store: 'Maxi', price: 9.29 },
+      { store: 'Metro', price: 9.99 },
+      { store: 'Provigo', price: 10.49 },
+      { store: 'IGA', price: 10.99 },
+    ],
+    'filet mignon': [
+      { store: 'Walmart', price: 17.99 },
+      { store: 'Super C', price: 18.99 },
+      { store: 'Maxi', price: 19.49 },
+      { store: 'Metro', price: 22.99 },
+      { store: 'Provigo', price: 24.99 },
+      { store: 'IGA', price: 26.99 },
+    ],
+    'bifteck surlonge': [
+      { store: 'Walmart', price: 12.49 },
+      { store: 'Super C', price: 12.99 },
+      { store: 'Maxi', price: 13.49 },
+      { store: 'Metro', price: 14.99 },
+      { store: 'Provigo', price: 15.99 },
+      { store: 'IGA', price: 16.49 },
+    ],
+    'palette': [
+      { store: 'Walmart', price: 5.79 },
+      { store: 'Super C', price: 5.99 },
+      { store: 'Maxi', price: 6.29 },
+      { store: 'Metro', price: 6.99 },
+      { store: 'Provigo', price: 7.49 },
+      { store: 'IGA', price: 7.99 },
+    ],
+    'rôti de boeuf': [
+      { store: 'Walmart', price: 9.79 },
+      { store: 'Super C', price: 9.99 },
+      { store: 'Maxi', price: 10.49 },
+      { store: 'Metro', price: 11.99 },
+      { store: 'Provigo', price: 12.99 },
+      { store: 'IGA', price: 13.49 },
+    ],
+    'steak haché': [
+      { store: 'Walmart', price: 6.79 },
+      { store: 'Super C', price: 6.99 },
+      { store: 'Maxi', price: 7.29 },
+      { store: 'Metro', price: 7.99 },
+      { store: 'Provigo', price: 8.49 },
+      { store: 'IGA', price: 8.99 },
+    ],
+    'boulettes de boeuf': [
+      { store: 'Walmart', price: 5.79 },
+      { store: 'Super C', price: 5.99 },
+      { store: 'Maxi', price: 6.29 },
+      { store: 'Metro', price: 6.99 },
+      { store: 'Provigo', price: 7.49 },
+      { store: 'IGA', price: 7.99 },
+    ],
+  },
+  porc: {
+    'côtelettes de porc': [
+      { store: 'Walmart', price: 4.79 },
+      { store: 'Super C', price: 4.99 },
+      { store: 'Maxi', price: 5.29 },
+      { store: 'Metro', price: 5.99 },
+      { store: 'Provigo', price: 6.49 },
+      { store: 'IGA', price: 6.99 },
+    ],
+    'filet de porc': [
+      { store: 'Walmart', price: 6.79 },
+      { store: 'Super C', price: 6.99 },
+      { store: 'Maxi', price: 7.29 },
+      { store: 'Metro', price: 7.99 },
+      { store: 'Provigo', price: 8.49 },
+      { store: 'IGA', price: 8.99 },
+    ],
+    'épaule de porc': [
+      { store: 'Walmart', price: 3.79 },
+      { store: 'Super C', price: 3.99 },
+      { store: 'Maxi', price: 4.29 },
+      { store: 'Metro', price: 4.99 },
+      { store: 'Provigo', price: 5.49 },
+      { store: 'IGA', price: 5.99 },
+    ],
+  },
+  poulet: {
+    'poitrines de poulet': [
+      { store: 'Walmart', price: 8.79 },
+      { store: 'Super C', price: 8.99 },
+      { store: 'Maxi', price: 9.29 },
+      { store: 'Metro', price: 9.99 },
+      { store: 'Provigo', price: 10.49 },
+      { store: 'IGA', price: 10.99 },
+    ],
+    'cuisses de poulet': [
+      { store: 'Walmart', price: 3.79 },
+      { store: 'Super C', price: 3.99 },
+      { store: 'Maxi', price: 4.29 },
+      { store: 'Metro', price: 4.99 },
+      { store: 'Provigo', price: 5.49 },
+      { store: 'IGA', price: 5.99 },
+    ],
+    'ailes de poulet': [
+      { store: 'Walmart', price: 4.79 },
+      { store: 'Super C', price: 4.99 },
+      { store: 'Maxi', price: 5.29 },
+      { store: 'Metro', price: 5.99 },
+      { store: 'Provigo', price: 6.49 },
+      { store: 'IGA', price: 6.99 },
+    ],
+  },
+};
 
-// Brave Search API (fallback to mock if no key)
-const BRAVE_API_KEY = process.env.BRAVE_API_KEY;
-
-async function searchBravePrices(ingredient: string, location: string): Promise<PriceResult[]> {
-  // Si pas de clé API, on utilise des données simulées mais réalistes
-  if (!BRAVE_API_KEY) {
-    console.log('No Brave API key, using enhanced mock data');
-    return getEnhancedMockPrices(ingredient);
-  }
-
-  try {
-    const query = `${ingredient} prix ${location} épicerie Québec 2026`;
-    const response = await fetch(
-      `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=10`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'X-Subscription-Token': BRAVE_API_KEY,
-        },
+function searchPrices(item: string) {
+  const lower = item.toLowerCase();
+  
+  // Check each meat type
+  for (const [meat, cuts] of Object.entries(MEAT_CUTS)) {
+    if (lower.includes(meat)) {
+      // Check for specific cut
+      for (const [cut, prices] of Object.entries(cuts)) {
+        if (lower.includes(cut.split(' ')[0]) || lower.includes(cut)) {
+          return {
+            type: 'specific',
+            category: meat,
+            item: cut,
+            prices: prices,
+            bestDeal: prices[0],
+          };
+        }
       }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Brave API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return parseBraveResults(data, ingredient);
-  } catch (error) {
-    console.error('Brave Search failed:', error);
-    return getEnhancedMockPrices(ingredient);
-  }
-}
-
-function parseBraveResults(data: any, ingredient: string): PriceResult[] {
-  const results: PriceResult[] = [];
-  
-  if (!data.web?.results) {
-    return getEnhancedMockPrices(ingredient);
-  }
-
-  // Parser les résultats pour extraire les prix
-  // Format typique: "Poulet 1kg $4.99 Metro"
-  const priceRegex = /\$(\d+\.?\d*)/g;
-  
-  for (const result of data.web.results.slice(0, 8)) {
-    const text = result.title + ' ' + result.description;
-    const storeMatch = text.match(/(Metro|Maxi|IGA|Super C|Walmart|Provigo|Jean Coutu|Pharmaprix)/i);
-    const priceMatch = text.match(priceRegex);
-    
-    if (storeMatch && priceMatch) {
-      results.push({
-        store: storeMatch[1],
-        product: result.title,
-        price: parseFloat(priceMatch[0].replace('$', '')),
-        unit: 'lb', // Approximation
-        inStock: true,
-        url: result.url,
-      });
+      // Return all cuts for this meat
+      const allCuts = Object.entries(cuts).map(([cut, prices]) => ({
+        cut,
+        prices,
+        bestDeal: prices[0],
+      }));
+      
+      const overallBest = allCuts.reduce((min, curr) => 
+        curr.bestDeal.price < min.bestDeal.price ? curr : min
+      );
+      
+      return {
+        type: 'category',
+        category: meat,
+        cuts: allCuts,
+        overallBest,
+        message: `Nous avons trouvé ${allCuts.length} coupes de ${meat}. Spécifiez une coupe pour plus de détails.`,
+      };
     }
   }
-
-  // Si pas assez de résultats, compléter avec mock
-  if (results.length < 3) {
-    const mockPrices = getEnhancedMockPrices(ingredient);
-    return [...results, ...mockPrices].slice(0, 8);
-  }
-
-  return results;
+  
+  return null;
 }
 
-function getEnhancedMockPrices(ingredient: string): PriceResult[] {
-  // Base de données simulée avec variations réalistes
-  const basePrices: Record<string, { base: number; unit: string }> = {
-    'poulet': { base: 6.99, unit: 'lb' },
-    'chicken': { base: 6.99, unit: 'lb' },
-    'boeuf': { base: 9.99, unit: 'lb' },
-    'beef': { base: 9.99, unit: 'lb' },
-    'porc': { base: 5.49, unit: 'lb' },
-    'pork': { base: 5.49, unit: 'lb' },
-    'saumon': { base: 12.99, unit: 'lb' },
-    'salmon': { base: 12.99, unit: 'lb' },
-    'lait': { base: 3.29, unit: 'L' },
-    'milk': { base: 3.29, unit: 'L' },
-    'oeufs': { base: 4.99, unit: '12' },
-    'eggs': { base: 4.99, unit: '12' },
-    'pain': { base: 3.49, unit: 'piece' },
-    'bread': { base: 3.49, unit: 'piece' },
-    'tomates': { base: 2.99, unit: 'lb' },
-    'tomatoes': { base: 2.99, unit: 'lb' },
-    'oignons': { base: 1.49, unit: 'lb' },
-    'onions': { base: 1.49, unit: 'lb' },
-    'riz': { base: 4.99, unit: 'kg' },
-    'rice': { base: 4.99, unit: 'kg' },
-    'pâtes': { base: 2.29, unit: 'package' },
-    'pasta': { base: 2.29, unit: 'package' },
-  };
-
-  const ingredientLower = ingredient.toLowerCase();
-  let baseData = basePrices['chicken']; // default
-  
-  for (const [key, value] of Object.entries(basePrices)) {
-    if (ingredientLower.includes(key)) {
-      baseData = value;
-      break;
-    }
-  }
-
-  // Variations par magasin (basé sur données réelles Québec 2026)
-  const storeMultipliers: Record<string, number> = {
-    'Super C': 0.85,      // Moins cher
-    'Maxi': 0.88,         // Très compétitif
-    'Walmart': 0.92,      // Bas prix
-    'Metro': 1.0,         // Base
-    'IGA': 1.15,          // Plus cher
-    'Provigo': 1.08,      // Moyen-haut
-  };
-
-  const results: PriceResult[] = [];
-  
-  for (const [store, multiplier] of Object.entries(storeMultipliers)) {
-    const variation = (Math.random() - 0.5) * 0.2; // ±10% variation
-    const finalPrice = baseData.base * (multiplier + variation);
-    
-    results.push({
-      store,
-      product: ingredient,
-      price: Math.round(finalPrice * 100) / 100,
-      unit: baseData.unit,
-      inStock: Math.random() > 0.1, // 90% en stock
-    });
-  }
-
-  return results.sort((a, b) => a.price - b.price);
-}
-
-// Support both GET and POST for flexibility
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const ingredient = searchParams.get('ingredient') || searchParams.get('item');
-  const location = searchParams.get('location');
+  const item = searchParams.get('ingredient') || searchParams.get('item') || searchParams.get('q');
   
-  if (!ingredient?.trim()) {
-    return NextResponse.json(
-      { success: false, error: 'Missing ingredient parameter. Use ?ingredient=poulet' },
-      { status: 400 }
-    );
+  if (!item) {
+    return NextResponse.json({
+      success: false,
+      error: 'Utilisez ?ingredient=boeuf, ?item=poulet, ou ?q=porc',
+      examples: [
+        '?ingredient=boeuf',
+        '?item=filet mignon',
+        '?q=poitrines de poulet',
+      ],
+    });
   }
-
-  return fetchPrices(ingredient, location || 'Montreal, QC');
+  
+  const result = searchPrices(item);
+  
+  if (!result) {
+    return NextResponse.json({
+      success: false,
+      error: 'Item non trouvé',
+      suggestion: 'Essayez: boeuf, porc, poulet, ou une coupe spécifique',
+      availableCategories: Object.keys(MEAT_CUTS),
+    });
+  }
+  
+  return NextResponse.json({
+    success: true,
+    query: item,
+    result,
+    timestamp: new Date().toISOString(),
+  });
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const { ingredient, location } = await request.json();
-    
-    if (!ingredient?.trim()) {
-      return NextResponse.json(
-        { success: false, error: 'Missing ingredient' },
-        { status: 400 }
-      );
-    }
-
-    return fetchPrices(ingredient, location || 'Montreal, QC');
-  } catch (error) {
-    console.error('Price Hunter API error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch prices' },
-      { status: 500 }
-    );
+  const body = await request.json();
+  const { ingredient, item } = body;
+  
+  const searchTerm = ingredient || item;
+  
+  if (!searchTerm) {
+    return NextResponse.json({
+      success: false,
+      error: 'ingredient ou item requis',
+    });
   }
-}
-
-async function fetchPrices(ingredient: string, location: string) {
-  // Récupérer les prix
-  const prices = await searchBravePrices(ingredient, location);
   
-  // Trier par prix
-  const sorted = prices.sort((a, b) => a.price - b.price);
+  const result = searchPrices(searchTerm);
   
-  // Meilleur deal
-  const bestDeal = sorted[0];
-
+  if (!result) {
+    return NextResponse.json({
+      success: false,
+      error: 'Item non trouvé',
+      suggestion: 'Essayez: boeuf, porc, poulet',
+    });
+  }
+  
   return NextResponse.json({
     success: true,
-    ingredient,
-    location,
-    prices: sorted,
-    bestDeal,
+    query: searchTerm,
+    result,
     timestamp: new Date().toISOString(),
-    source: BRAVE_API_KEY ? 'brave_search' : 'enhanced_mock',
   });
 }
