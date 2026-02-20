@@ -1,8 +1,5 @@
 "use client";
 
-// Force dynamic rendering (no cache)
-export const dynamic = 'force-dynamic';
-
 import { useState, useEffect } from "react";
 import { generateRecipe, type Recipe } from "./actions";
 import { useCamera, useVoice } from "@/hooks";
@@ -13,7 +10,7 @@ import {
 import clsx from "clsx";
 
 export default function Home() {
-  const [mode, setMode] = useState<"scan" | "text">("text"); // Default to TEXT mode
+  const [mode, setMode] = useState<"scan" | "text">("text");
   const [textInput, setTextInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
