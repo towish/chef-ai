@@ -25,9 +25,9 @@ export default function PriceHunterPage() {
   const [groceryList, setGroceryList] = useState<ProductResult[]>([]);
   const [showList, setShowList] = useState(false);
 
-  // Load categories on mount (client-side only)
+  // Load categories on mount (client-side only) - with cache busting
   useEffect(() => {
-    fetch('/api/prices?list=categories')
+    fetch(`/api/prices?list=categories&t=${Date.now()}`)
       .then(r => r.json())
       .then(data => {
         if (data.success) setCategories(data.categories);
@@ -43,7 +43,8 @@ export default function PriceHunterPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/prices?q=${encodeURIComponent(ingredient)}`);
+      // Add cache-busting timestamp
+      const res = await fetch(`/api/prices?q=${encodeURIComponent(ingredient)}&t=${Date.now()}`);
       const data = await res.json();
       if (data.success) {
         setResults(data.results);

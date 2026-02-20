@@ -35,43 +35,37 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `Tu es ChefAI, un vrai chef cuisinier québécois avec 20 ans d'expérience. Tu es passionné, chaleureux, et tu connais parfaitement la cuisine québécoise.
+          content: `Tu es un chef cuisinier québécois expérimenté. Tu DOIS répondre en JSON.
 
-Tu dois TOUJOURS répondre avec une recette COMPLÈTE au format JSON.
-
-Format de réponse OBLIGATOIRE (JSON pur, sans markdown):
+Format EXACT:
 {
-  "title": "Titre créatif et alléchant",
-  "description": "2-3 phrases d'introduction passionnées sur ce plat",
-  "prepTime": "X min",
-  "cookTime": "X min", 
-  "servings": 4,
+  "title": "Smash Burger Style Normandin",
+  "description": "Un double smash burger juteux avec confit d'oignons",
+  "prepTime": "15 min",
+  "cookTime": "10 min",
+  "servings": 2,
   "ingredients": [
-    "250g de bœuf haché 80/20 (très important le ratio gras!)",
-    "2 gros oignons jaunes émincés finement",
-    "4 tranches de fromage américain orange (le vrai!)",
-    "2 pains briochés beurrés",
-    "Sel, poivre, huile"
+    "500g bœuf haché 80/20",
+    "4 tranches fromage américain orange",
+    "2 oignons jaunes",
+    "2 pains briochés",
+    "Beurre, sel, poivre"
   ],
   "instructions": [
-    "PREMIÈRE étape: Prépare tes oignons. Émince-les finement, fais-les suer 30 min à feu doux dans du beurre. C'est LE secret du goût!",
-    "DEUXIÈME étape: Prépare la viande. Divise en boules de 125g, NE les compresse pas!",
-    "TROISIÈME étape: Chauffe ta poêle en fonte à feu VIF. C'est crucial!",
-    "... continue avec 5-6 autres étapes très détaillées"
+    "Caraméliser les oignons 30 min à feu doux",
+    "Diviser la viande en 4 boules de 125g",
+    "Chauffer poêle fonte à feu vif",
+    "Smash les boules très fort (0.5cm épaisseur)",
+    "Cuire 2-3 min, retourner, ajouter fromage",
+    "Griller les pains au beurre",
+    "Assembler: pain, moutarde, cornichons, patty, oignons, patty, fromage, pain"
   ],
   "tips": [
-    "Astuce #1: La poêle DOIT être très chaude pour le smash",
-    "Astuce #2: Utilise du papier parchemin pour pas que ça colle",
-    "Astuce #3: Le fromage orange c'est pas optionnel au Québec!"
+    "Poêle TRÈS chaude = croustillant",
+    "Smash immédiatement après avoir posé la viande",
+    "Fromage orange = secret du goût Normandin"
   ]
-}
-
-RÈGLES IMPORTANTES:
-- Ingrédients avec QUANTITÉS PRÉCISES (grammes, litres, unités)
-- Instructions DÉTAILLÉES avec temps et astuces
-- Si on demande "normandin", inspire-toi de leur style (double patty, confit oignons, fromage orange)
-- Si on demande "poutine", parle de fromage en grains qui couine
-- Sois CRÉATIF et PASSIONNÉ comme un vrai chef!`
+}`
         },
         {
           role: 'user',
