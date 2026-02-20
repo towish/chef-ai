@@ -149,6 +149,22 @@ function getEnhancedMockPrices(ingredient: string): PriceResult[] {
   return results.sort((a, b) => a.price - b.price);
 }
 
+// Support both GET and POST for flexibility
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const ingredient = searchParams.get('ingredient') || searchParams.get('item');
+  const location = searchParams.get('location');
+  
+  if (!ingredient?.trim()) {
+    return NextResponse.json(
+      { success: false, error: 'Missing ingredient parameter. Use ?ingredient=poulet' },
+      { status: 400 }
+    );
+  }
+
+  return fetchPrices(ingredient, location || 'Montreal, QC');
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { ingredient, location } = await request.json();
@@ -160,24 +176,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Récupérer les prix
-    const prices = await searchBravePrices(ingredient, location || 'Montreal, QC');
-    
-    // Trier par prix
-    const sorted = prices.sort((a, b) => a.price - b.price);
-    
-    // Meilleur deal
-    const bestDeal = sorted[0];
-
-    return NextResponse.json({
-      success: true,
-      ingredient,
-      location: location || 'Montreal, QC',
-      prices: sorted,
-      bestDeal,
-      timestamp: new Date().toISOString(),
-      source: BRAVE_API_KEY ? 'brave_search' : 'enhanced_mock',
-    });
+    return fetchPrices(ingredient, location || 'Montreal, QC');
   } catch (error) {
     console.error('Price Hunter API error:', error);
     return NextResponse.json(
@@ -185,4 +184,25 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+async function fetchPrices(ingredient: string, location: string) {
+  // Récupérer les prix
+  const prices = await searchBravePrices(ingredient, location);
+  
+  // Trier par prix
+  const sorted = prices.sort((a, b) => a.price - b.price);
+  
+  // Meilleur deal
+  const bestDeal = sorted[0];
+
+  return NextResponse.json({
+    success: true,
+    ingredient,
+    location,
+    prices: sorted,
+    bestDeal,
+    timestamp: new Date().toISOString(),
+    source: BRAVE_API_KEY ? 'brave_search' : 'enhanced_mock',
+  });
 }
