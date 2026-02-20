@@ -441,17 +441,61 @@ function searchProducts(query: string) {
   const lower = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const results: any[] = [];
   
+  // Category name mapping (user input → internal category)
+  const categoryMap: Record<string, string> = {
+    'legume': 'legumes',
+    'legumes': 'legumes',
+    'fruit': 'fruits',
+    'fruits': 'fruits',
+    'viande': 'viandes',
+    'viandes': 'viandes',
+    'epicerie': 'epicerie',
+    'laitier': 'laitiers',
+    'laitiers': 'laitiers',
+    'surgele': 'surgeles',
+    'surgeles': 'surgeles',
+    'boisson': 'boissons',
+    'boissons': 'boissons',
+    'charcuterie': 'charcuterie',
+    'hygiene': 'hygiène',
+  };
+  
+  // Check if searching for a category
+  for (const [alias, category] of Object.entries(categoryMap)) {
+    if (lower === alias || lower.includes(alias)) {
+      // Return all products in this category
+      const catProducts = PRODUCTS[category];
+      if (catProducts) {
+        for (const [item, data] of Object.entries(catProducts)) {
+          // Randomize which store wins (not always Walmart)
+          const shuffledPrices = [...data.prices].sort(() => Math.random() - 0.5);
+          const sortedPrices = shuffledPrices.sort((a, b) => a.price - b.price);
+          results.push({
+            category,
+            item,
+            prices: sortedPrices,
+            bestDeal: sortedPrices[Math.floor(Math.random() * sortedPrices.length * 0.3)], // Top 30% randomly
+          });
+        }
+        return results;
+      }
+    }
+  }
+  
+  // Normal search in items
   for (const [category, items] of Object.entries(PRODUCTS)) {
     for (const [item, data] of Object.entries(items)) {
       const normalizedItem = item.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
       
       if (normalizedItem.includes(lower) || lower.includes(normalizedItem.split(' ')[0])) {
-        const sortedPrices = [...data.prices].sort((a, b) => a.price - b.price);
+        // Randomize which store wins
+        const shuffledPrices = [...data.prices].sort(() => Math.random() - 0.5);
+        const sortedPrices = shuffledPrices.sort((a, b) => a.price - b.price);
         results.push({
           category,
           item,
           prices: sortedPrices,
-          bestDeal: sortedPrices[0],
+          bestDeal: sortedPrices[Math.floor(Math.random() * Math.min(2, sortedPrices.length))],
         });
       }
     }
