@@ -101,7 +101,7 @@ export default function PriceHunterPage() {
     });
     
     text += `💰 TOTAL: $${grandTotal.toFixed(2)}\n`;
-    text += `\nGénéré par ChefAI Price Hunter`;
+    text += `\nGenere par ChefAI Price Hunter`;
     
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -118,9 +118,9 @@ export default function PriceHunterPage() {
         <div className="text-center mb-4">
           <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-full mb-3">
             <TrendingDown className="w-4 h-4 text-green-400" />
-            <span className="text-green-400 text-sm font-medium">300+ produits comparés</span>
+            <span className="text-green-400 text-sm font-medium">300+ produits compares</span>
           </div>
-          <h1 className="text-2xl font-bold mb-1">Price Hunter Québec</h1>
+          <h1 className="text-2xl font-bold mb-1">Price Hunter Quebec</h1>
           <p className="text-neutral-400 text-sm">Walmart • Super C • Maxi • Metro • Provigo • IGA</p>
         </div>
 
@@ -128,7 +128,7 @@ export default function PriceHunterPage() {
         <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 mb-4 flex items-start gap-2">
           <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
           <p className="text-xs text-amber-200">
-            Prix indicatifs basés sur les circulaire québécoises. Validez en magasin.
+            Prix indicatifs bases sur les circulaire quebecoises. Validez en magasin.
           </p>
         </div>
 
@@ -196,7 +196,7 @@ export default function PriceHunterPage() {
 
             <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-center">
               <div className="text-2xl font-bold text-green-400">${grandTotal.toFixed(2)}</div>
-              <div className="text-sm text-neutral-400">Total estimé</div>
+              <div className="text-sm text-neutral-400">Total estime</div>
             </div>
           </div>
         )}
