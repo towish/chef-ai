@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // ═══════════════════════════════════════════════════════════
-// Price Hunter API — VERSION CORRIGÉE
+// Price Hunter API — VERSION FINALE
 // ═══════════════════════════════════════════════════════════
 
 function makePrices(basePrice: number, unit?: string) {
@@ -14,39 +14,33 @@ function makePrices(basePrice: number, unit?: string) {
   }));
 }
 
-// PRODUITS ORGANISÉS PAR CATÉGORIE
 const PRODUCTS = {
   viandes: {
-    // BŒUF (9 produits)
-    'bœuf haché extra-maigre': makePrices(12.99, 'kg'),
-    'bœuf haché mi-maigre': makePrices(10.99, 'kg'),
-    'bœuf haché régulier': makePrices(8.99, 'kg'),
+    'boeuf haché maigre': makePrices(12.99, 'kg'),
+    'boeuf haché mi-maigre': makePrices(10.99, 'kg'),
+    'boeuf haché régulier': makePrices(8.99, 'kg'),
     'steak haché': makePrices(11.99, 'kg'),
-    'boulettes de bœuf': makePrices(9.99, 'kg'),
+    'boulettes de boeuf': makePrices(9.99, 'kg'),
     'haut de surlonge': makePrices(17.99, 'kg'),
-    'bifteck de surlonge': makePrices(22.99, 'kg'),
-    'rôti de bœuf': makePrices(15.99, 'kg'),
-    'ribs de bœuf': makePrices(18.99, 'kg'),
-    // PORC (5 produits)
+    'bifteck surlonge': makePrices(22.99, 'kg'),
+    'rôti de boeuf': makePrices(15.99, 'kg'),
+    'ribs de boeuf': makePrices(18.99, 'kg'),
     'filet de porc': makePrices(10.99, 'kg'),
     'côtelettes de porc': makePrices(7.99, 'kg'),
     'épaule de porc': makePrices(5.99, 'kg'),
     'travers de porc': makePrices(7.49, 'kg'),
     'bacon': makePrices(7.99, '375g'),
-    // POULET (6 produits)
     'poulet entier': makePrices(2.99, 'lb'),
     'poitrines de poulet': makePrices(11.99, 'kg'),
     'cuisses de poulet': makePrices(5.99, 'kg'),
     'ailes de poulet': makePrices(8.99, 'kg'),
     'escalopes de poulet': makePrices(13.99, 'kg'),
     'dinde entière': makePrices(2.49, 'lb'),
-    // POISSON (4 produits)
     'saumon frais': makePrices(14.99, 'kg'),
     'tilapia': makePrices(12.99, 'kg'),
     'morue': makePrices(15.99, 'kg'),
     'crevettes': makePrices(12.99, 'kg'),
   },
-  
   fruits: {
     'pommes': makePrices(1.99, 'lb'),
     'bananes': makePrices(0.69, 'lb'),
@@ -64,14 +58,12 @@ const PRODUCTS = {
     'pêches': makePrices(2.99, 'lb'),
     'kiwis': makePrices(0.69, 'unité'),
   },
-  
   legumes: {
     'carottes': makePrices(1.99, '2lb'),
     'brocoli': makePrices(2.49, 'unité'),
     'chou-fleur': makePrices(3.99, 'unité'),
     'épinards': makePrices(3.49, '225g'),
     'laitue romaine': makePrices(2.49, 'unité'),
-    'laitue iceberg': makePrices(1.99, 'unité'),
     'tomates': makePrices(2.49, 'lb'),
     'tomates cerises': makePrices(3.99, '227g'),
     'concombres': makePrices(1.29, 'unité'),
@@ -87,9 +79,7 @@ const PRODUCTS = {
     'haricots verts': makePrices(3.49, 'lb'),
     'patates douces': makePrices(1.99, 'lb'),
     'betteraves': makePrices(2.49, 'lb'),
-    'courge butternut': makePrices(1.99, 'lb'),
   },
-  
   laitiers: {
     'lait 2%': makePrices(5.99, '4L'),
     'lait 1%': makePrices(5.99, '4L'),
@@ -101,11 +91,10 @@ const PRODUCTS = {
     'crème sure': makePrices(3.49, '500ml'),
     'yogourt nature': makePrices(5.99, '750g'),
     'yogourt grec': makePrices(6.99, '500g'),
-    'œufs': makePrices(5.99, '12'),
-    'lait d\'amande': makePrices(4.99, '1.89L'),
-    'lait de soya': makePrices(4.79, '1.89L'),
+    'oeufs': makePrices(5.99, '12'),
+    'lait amande': makePrices(4.99, '1.89L'),
+    'lait soya': makePrices(4.79, '1.89L'),
   },
-  
   epicerie: {
     'riz blanc': makePrices(5.99, '2kg'),
     'riz brun': makePrices(6.99, '2kg'),
@@ -114,7 +103,7 @@ const PRODUCTS = {
     'farine': makePrices(5.99, '2.5kg'),
     'sucre': makePrices(3.99, '2kg'),
     'miel': makePrices(8.99, '500g'),
-    'sirop d\'érable': makePrices(12.99, '540ml'),
+    'sirop érable': makePrices(12.99, '540ml'),
     'huile canola': makePrices(6.99, '1L'),
     'huile olive': makePrices(11.99, '1L'),
     'ketchup': makePrices(4.99, '1L'),
@@ -123,10 +112,10 @@ const PRODUCTS = {
     'sel': makePrices(2.49, '1kg'),
     'poivre': makePrices(5.99, '100g'),
     'bouillon poulet': makePrices(4.99, '6 cubes'),
-    'tomates en conserve': makePrices(1.99, '796ml'),
+    'tomates conserve': makePrices(1.99, '796ml'),
     'haricots rouges': makePrices(1.49, '540ml'),
-    'maïs en conserve': makePrices(1.29, '341ml'),
-    'thon en conserve': makePrices(3.49, '170g'),
+    'maïs conserve': makePrices(1.29, '341ml'),
+    'thon conserve': makePrices(3.49, '170g'),
     'pain tranché': makePrices(3.49, '675g'),
     'bagels': makePrices(3.99, '6 unités'),
     'tortillas': makePrices(3.99, '10 unités'),
@@ -137,9 +126,7 @@ const PRODUCTS = {
     'croustilles': makePrices(4.99, '255g'),
     'biscuits': makePrices(4.99, '400g'),
     'noix': makePrices(9.99, '400g'),
-    'chocolat': makePrices(3.99, '100g'),
   },
-  
   surgeles: {
     'pizza pepperoni': makePrices(6.99, 'unité'),
     'pizza fromage': makePrices(6.49, 'unité'),
@@ -148,9 +135,7 @@ const PRODUCTS = {
     'nuggets poulet': makePrices(8.99, '800g'),
     'poisson pané': makePrices(9.99, '500g'),
     'crème glacée vanille': makePrices(6.99, '2L'),
-    'crème glacée chocolat': makePrices(6.99, '2L'),
   },
-  
   boissons: {
     'eau embouteillée': makePrices(3.99, '24x500ml'),
     'jus orange': makePrices(5.99, '1.89L'),
@@ -158,7 +143,6 @@ const PRODUCTS = {
     'cola': makePrices(3.99, '2L'),
     'thé glacé': makePrices(2.99, '1.89L'),
   },
-  
   hygiene: {
     'savon vaisselle': makePrices(3.49, '739ml'),
     'détergent lessive': makePrices(12.99, '4.43L'),
@@ -170,85 +154,43 @@ const PRODUCTS = {
   },
 };
 
-// MAPPING CATÉGORIES (entrée utilisateur → catégorie)
 const CATEGORY_MAP: Record<string, string> = {
-  'viande': 'viandes',
-  'viandes': 'viandes',
-  'boeuf': 'viandes',
-  'bœuf': 'viandes',
-  'porc': 'viandes',
-  'poulet': 'viandes',
-  'poisson': 'viandes',
-  
-  'fruit': 'fruits',
-  'fruits': 'fruits',
-  
-  'legume': 'legumes',
-  'légume': 'legumes',
-  'legumes': 'legumes',
-  'légumes': 'legumes',
-  'légume': 'legumes',
-  
-  'laitier': 'laitiers',
-  'laitiers': 'laitiers',
-  'produit laitier': 'laitiers',
-  'lait': 'laitiers',
-  'fromage': 'laitiers',
-  'oeuf': 'laitiers',
-  'œuf': 'laitiers',
-  
+  'viande': 'viandes', 'viandes': 'viandes',
+  'boeuf': 'viandes', 'porc': 'viandes', 'poulet': 'viandes', 'poisson': 'viandes',
+  'fruit': 'fruits', 'fruits': 'fruits',
+  'legume': 'legumes', 'legumes': 'legumes',
+  'laitier': 'laitiers', 'laitiers': 'laitiers', 'lait': 'laitiers', 'fromage': 'laitiers',
   'epicerie': 'epicerie',
-  'épicerie': 'epicerie',
-  'grocery': 'epicerie',
-  
-  'surgele': 'surgeles',
-  'surgelé': 'surgeles',
-  'surgelés': 'surgeles',
-  'frozen': 'surgeles',
-  
-  'boisson': 'boissons',
-  'boissons': 'boissons',
-  
+  'surgele': 'surgeles', 'surgeles': 'surgeles',
+  'boisson': 'boissons', 'boissons': 'boissons',
   'hygiene': 'hygiene',
-  'hygiène': 'hygiene',
-  'nettoyage': 'hygiene',
 };
 
 function searchProducts(query: string) {
   const normalized = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const results: any[] = [];
   
-  // 1. Vérifier si c'est une catégorie
+  // Check category
   for (const [alias, category] of Object.entries(CATEGORY_MAP)) {
     if (normalized === alias || normalized.includes(alias)) {
       const catProducts = PRODUCTS[category as keyof typeof PRODUCTS];
       if (catProducts) {
         for (const [item, prices] of Object.entries(catProducts)) {
           const sorted = [...prices].sort((a, b) => a.price - b.price);
-          results.push({
-            category,
-            item,
-            prices: sorted,
-            bestDeal: sorted[Math.floor(Math.random() * 2)],
-          });
+          results.push({ category, item, prices: sorted, bestDeal: sorted[0] });
         }
-        return results; // Retourner TOUS les produits de la catégorie
+        return results;
       }
     }
   }
   
-  // 2. Sinon, chercher dans les noms de produits
+  // Search items
   for (const [category, items] of Object.entries(PRODUCTS)) {
     for (const [item, prices] of Object.entries(items)) {
       const normalizedItem = item.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
       if (normalizedItem.includes(normalized) || normalized.includes(normalizedItem.split(' ')[0])) {
         const sorted = [...prices].sort((a, b) => a.price - b.price);
-        results.push({
-          category,
-          item,
-          prices: sorted,
-          bestDeal: sorted[0],
-        });
+        results.push({ category, item, prices: sorted, bestDeal: sorted[0] });
       }
     }
   }
@@ -269,34 +211,16 @@ export async function GET(request: NextRequest) {
   const list = searchParams.get('list');
   
   if (list === 'categories') {
-    return NextResponse.json({
-      success: true,
-      categories: listCategories(),
-      totalProducts: Object.values(PRODUCTS).reduce((sum, cat) => sum + Object.keys(cat).length, 0),
-    });
+    return NextResponse.json({ success: true, categories: listCategories(), totalProducts: Object.values(PRODUCTS).reduce((s, c) => s + Object.keys(c).length, 0) });
   }
   
   if (q) {
     const results = searchProducts(q);
     if (results.length === 0) {
-      return NextResponse.json({
-        success: false,
-        error: 'Aucun produit trouvé',
-        suggestion: 'Catégories: viandes, fruits, legumes, laitiers, epicerie, surgeles, boissons, hygiene',
-      });
+      return NextResponse.json({ success: false, error: 'Non trouvé', suggestion: 'viandes, fruits, legumes, laitiers, epicerie, surgeles, boissons, hygiene' });
     }
-    return NextResponse.json({
-      success: true,
-      query: q,
-      results,
-      count: results.length,
-    });
+    return NextResponse.json({ success: true, query: q, results, count: results.length });
   }
   
-  return NextResponse.json({
-    success: true,
-    message: 'Price Hunter API',
-    categories: Object.keys(PRODUCTS),
-    totalProducts: Object.values(PRODUCTS).reduce((sum, cat) => sum + Object.keys(cat).length, 0),
-  });
+  return NextResponse.json({ success: true, categories: Object.keys(PRODUCTS), totalProducts: Object.values(PRODUCTS).reduce((s, c) => s + Object.keys(c).length, 0) });
 }
